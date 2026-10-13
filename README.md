@@ -2,8 +2,6 @@
 
 Lalao **Katro** (lalao nentim-paharazana malagasy) natao tamin'ny **Next.js** + React + Tailwind CSS.
 
-Mifototra amin'ny lojika Flutter/Dart tany am-piandohana (board, capture, sowing, AI).
-
 ## Fampiasana
 
 ```bash
@@ -29,5 +27,4 @@ Avy eo sokafy http://localhost:3000
 - `src/components/KatroGame.tsx` — UI sy game loop
 - `src/app/page.tsx` — pejy lehibe
 
-Namboarina avy amin'ny code Flutter original (lib.zip).
-"# gknextjs" 
+
