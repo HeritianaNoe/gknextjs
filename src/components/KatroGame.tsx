@@ -20,12 +20,12 @@ const GREEN_COLOR = "#2E9E43";
 const RED_COLOR = "#D32F2F";
 
 const SEED_COLORS = [
-  "#8E9B8A",
-  "#9AA595",
-  "#7E8C7B",
-  "#B3AA92",
-  "#A7A892",
-  "#8A9684",
+  "#F1E8D0",
+  "#E6D3A8",
+  "#D9C08A",
+  "#EADFC4",
+  "#CDAE70",
+  "#E2C98F",
 ];
 
 /** Deterministic pseudo-random for stable seed positions */
@@ -109,7 +109,7 @@ function Pit({
   const cx = size / 2;
   const cy = size / 2;
   const seeds = useMemo(() => computeSeeds(count, holeIdx, r), [count, holeIdx, r]);
-  const sideTint = owner === GREEN ? "rgba(46,158,67,0.18)" : "rgba(211,47,47,0.18)";
+  const sideStroke = owner === GREEN ? "rgba(70,190,90,0.75)" : "rgba(235,80,70,0.75)";
 
   return (
     <button
@@ -127,12 +127,15 @@ function Pit({
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <defs>
           <radialGradient id={`holeGrad-${holeIdx}`} cx="40%" cy="35%" r="65%">
-            <stop offset="0%" stopColor="#3D2814" />
-            <stop offset="55%" stopColor="#2A1A0C" />
-            <stop offset="100%" stopColor="#1A1008" />
+            <stop offset="0%" stopColor="#3A1E0A" />
+            <stop offset="100%" stopColor="#140A03" />
           </radialGradient>
+          <linearGradient id={`bevel-${holeIdx}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#2B1405" />
+            <stop offset="100%" stopColor="#F0BE82" />
+          </linearGradient>
           <filter id={`blur-${holeIdx}`}>
-            <feGaussianBlur stdDeviation="2" />
+            <feGaussianBlur stdDeviation="2.5" />
           </filter>
           <filter id={`seedShadow-${holeIdx}`}>
             <feDropShadow dx="1.2" dy="1.8" stdDeviation="1.2" floodOpacity="0.4" />
@@ -156,38 +159,19 @@ function Pit({
           })}
         </defs>
 
-        {/* Outer shadow under pit */}
-        <ellipse
-          cx={cx}
-          cy={cy + 3}
-          rx={r + 2}
-          ry={r + 1}
-          fill="rgba(0,0,0,0.25)"
-          filter={`url(#blur-${holeIdx})`}
-        />
-
-        {/* Pit outer rim (wood edge) */}
-        <circle cx={cx} cy={cy} r={r + 3} fill="#5C3317" />
-        <circle cx={cx} cy={cy} r={r + 1.5} fill="#7A4A22" />
-
-        {/* Side color wash */}
-        <circle cx={cx} cy={cy} r={r + 0.5} fill={sideTint} />
-
-        {/* Inner hole (dark recessed) */}
+        {/* Carved hole: bevel lit from top-left, deep dark interior */}
+        <circle cx={cx} cy={cy + 2} r={r + 6} fill="rgba(30,12,2,0.35)" filter={`url(#blur-${holeIdx})`} />
+        <circle cx={cx} cy={cy} r={r + 5} fill={`url(#bevel-${holeIdx})`} />
+        <circle cx={cx} cy={cy} r={r + 4.2} fill="none" stroke={sideStroke} strokeWidth="2.4" />
+        <circle cx={cx} cy={cy} r={r + 1.5} fill="#1C0D03" />
         <circle cx={cx} cy={cy} r={r} fill={`url(#holeGrad-${holeIdx})`} />
-
-        {/* Inner rim highlight (top-left light) */}
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r - 1}
-          fill="none"
-          stroke="rgba(255,226,184,0.25)"
-          strokeWidth="2"
-          strokeDasharray={`${round4(Math.PI * r * 0.55)} ${round4(Math.PI * r * 1.5)}`}
-          strokeLinecap="round"
-          transform={`rotate(-30 ${cx} ${cy})`}
-        />
+        {/* Inner shadow (top-left) and lit lip (bottom-right) */}
+        <circle cx={cx} cy={cy} r={r - 2} fill="none" stroke="rgba(0,0,0,0.6)" strokeWidth="5"
+          strokeDasharray={`${round4(Math.PI * r * 0.9)} ${round4(Math.PI * r * 1.2)}`}
+          transform={`rotate(144 ${cx} ${cy})`} />
+        <circle cx={cx} cy={cy} r={r - 1} fill="none" stroke="rgba(255,200,140,0.3)" strokeWidth="2"
+          strokeDasharray={`${round4(Math.PI * r * 0.9)} ${round4(Math.PI * r * 1.2)}`}
+          transform={`rotate(-36 ${cx} ${cy})`} />
 
         {/* Seeds / vato */}
         {seeds.map((s, i) => (
@@ -228,8 +212,8 @@ function Pit({
             cy={cy}
             r={r + 2.5}
             fill="none"
-            stroke="rgba(255,235,59,0.7)"
-            strokeWidth="2.5"
+            stroke="#FFD54A"
+            strokeWidth="3"
             className="opacity-60 group-hover:opacity-100"
           />
         )}
@@ -238,9 +222,15 @@ function Pit({
       {/* Count badge */}
       {count > 0 && (
         <span
-          className="absolute bottom-0.5 right-0.5 font-bold leading-none px-1 rounded
-            bg-black/55 text-white/95 pointer-events-none"
-          style={{ fontSize: Math.max(9, size * 0.14) }}
+          className="absolute bottom-0 right-0 font-bold leading-none px-1.5 py-0.5 rounded-full
+            pointer-events-none"
+          style={{
+            fontSize: Math.max(10, size * 0.16),
+            background: "#F6EBD3",
+            color: "#3B1F0C",
+            border: "1.5px solid #4A260E",
+            boxShadow: "0 1px 2px rgba(0,0,0,0.4)",
+          }}
         >
           {count}
         </span>
@@ -263,19 +253,20 @@ export default function KatroGame() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [pitSize, setPitSize] = useState(64);
 
-  // Responsive pit size
+  // Responsive pit size (measure the board bed)
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
     const update = () => {
-      const w = containerRef.current?.clientWidth ?? 360;
-      const cols = board.cols;
-      const gap = 6;
-      const pad = 20;
-      const available = w - pad * 2 - gap * (cols - 1);
-      setPitSize(Math.min(72, Math.max(44, Math.floor(available / cols))));
+      const cs = getComputedStyle(el);
+      const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 8;
+      const available = el.clientWidth - pad - 8 * (board.cols - 1);
+      setPitSize(Math.min(96, Math.max(40, Math.floor(available / board.cols))));
     };
     update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, [board.cols]);
 
   const resetGame = useCallback(
@@ -423,7 +414,7 @@ export default function KatroGame() {
     const owner = row < 2 ? GREEN : RED;
     return (
       <div
-        className="grid gap-1.5 justify-items-center"
+        className="grid gap-2 justify-items-center"
         style={{ gridTemplateColumns: `repeat(${cols}, 1fr)` }}
       >
         {Array.from({ length: cols }, (_, col) => {
@@ -452,122 +443,65 @@ export default function KatroGame() {
     );
   };
 
+  const greenTint = currentColor === GREEN && !gameOver ? "rgba(46,158,67,0.28)" : "rgba(46,158,67,0.10)";
+  const redTint = currentColor === RED && !gameOver ? "rgba(211,47,47,0.28)" : "rgba(211,47,47,0.10)";
+
   return (
-    <div className="flex flex-col items-center w-full max-w-[600px] mx-auto gap-3 py-4">
-      {/* Header — Misaraka amin'ny cadre, soratra marron maizina/mainty */}
-      <div className="w-full text-center py-2">
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-wider" style={{ color: "#3E2723" }}>
-          KATRO
-        </h1>
-        <p className="text-md font-medium italic mt-0.5" style={{ color: "#5D4037" }}>
+    <div className="flex flex-col items-center w-full max-w-[640px] mx-auto gap-4 py-2">
+      <div className="w-full text-center">
+        <h1 className="katro-title leading-none">KATRO</h1>
+        <p className="text-base italic mt-1" style={{ color: "#4B3A2A" }}>
           Lalao nentim-paharazana Malagasy
         </p>
       </div>
 
-      {/* Cadre misy ny lalao katro — Cream body #F1E3C8 */}
-      <div
-        className="w-full flex flex-col items-center gap-3 px-3 pt-3 pb-4 rounded-xl shadow-md border"
-        style={{ backgroundColor: "#F1E3C8", borderColor: "rgba(109,68,37,0.2)" }}
-      >
-        {/* Role chips + buttons */}
-        <div className="flex flex-wrap items-center justify-between w-full gap-2">
-          <div className="flex flex-wrap gap-2">
-            <RoleChip
-              color={GREEN_COLOR}
-              active={!gameOver && currentColor === GREEN}
-              text={`${roleOf(GREEN)}`}
-            />
-            <RoleChip
-              color={RED_COLOR}
-              active={!gameOver && currentColor === RED}
-              text={`${roleOf(RED)}`}
-            />
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={openSettings}
-              className="px-3 py-1.5 text-sm rounded border font-medium bg-white/60 hover:bg-white transition-colors"
-              style={{ borderColor: "#6D4425", color: "#6D4425" }}
-            >
-              Settings
-            </button>
-            <button
-              onClick={() => resetGame()}
-              className="px-3 py-1.5 text-sm rounded border font-medium bg-white/60 hover:bg-white transition-colors"
-              style={{ borderColor: "#6D4425", color: "#6D4425" }}
-            >
-              Restart
-            </button>
-          </div>
+      <div className="flex w-full flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap gap-2">
+          <RoleChip
+            color={GREEN_COLOR}
+            active={!gameOver && currentColor === GREEN}
+            text={roleOf(GREEN)}
+            count={board.sideSum(GREEN)}
+          />
+          <RoleChip
+            color={RED_COLOR}
+            active={!gameOver && currentColor === RED}
+            text={roleOf(RED)}
+            count={board.sideSum(RED)}
+          />
         </div>
+        <div className="flex gap-2">
+          <button onClick={openSettings} className="katro-btn">Settings</button>
+          <button onClick={() => resetGame()} className="katro-btn">Restart</button>
+        </div>
+      </div>
 
-        {gameOver && message && (
-          <p className="font-semibold text-center text-amber-900 bg-amber-100 px-4 py-2 rounded-lg">
-            {message}
-          </p>
-        )}
+      {gameOver && message && (
+        <p className="font-semibold text-center px-4 py-2 rounded-lg" style={{ background: "#FFE9A8", color: "#4A2E05", border: "1px solid #B8860B" }}>
+          {message}
+        </p>
+      )}
 
-        {/* Wooden board */}
-        <div ref={containerRef} className="w-full">
-          <div
-            className="relative mx-auto rounded-2xl overflow-hidden"
-            style={{
-              background: "linear-gradient(135deg, #B9743D 0%, #9C5A2B 50%, #AD6934 100%)",
-              boxShadow: "0 6px 16px rgba(0,0,0,0.35)",
-              border: "3px solid #4A260E",
-              padding: "12px 10px",
-            }}
-          >
-            {/* Wood grain */}
-            <div
-              className="absolute inset-0 pointer-events-none opacity-[0.18]"
-              style={{
-                backgroundImage: `repeating-linear-gradient(
-                  0deg,
-                  transparent,
-                  transparent 13px,
-                  rgba(59,29,8,0.4) 13px,
-                  rgba(59,29,8,0.4) 14px
-                )`,
-              }}
-            />
-
-            <div className="relative z-10 space-y-1">
-              {/* Green half (top) */}
-              <div
-                className="rounded-xl px-1 py-1.5 space-y-1.5"
-                style={{
-                  background:
-                    currentColor === GREEN && !gameOver
-                      ? "rgba(46,158,67,0.22)"
-                      : "rgba(46,158,67,0.08)",
-                }}
-              >
-                {renderRow(0)}
-                {renderRow(1)}
-              </div>
-
-              {/* Red half (bottom) */}
-              <div
-                className="rounded-xl px-1 py-1.5 space-y-1.5"
-                style={{
-                  background:
-                    currentColor === RED && !gameOver
-                      ? "rgba(211,47,47,0.22)"
-                      : "rgba(211,47,47,0.08)",
-                }}
-              >
-                {renderRow(2)}
-                {renderRow(3)}
-              </div>
+      {/* Cadre > bande sculptée > plateau */}
+      <div className="katro-frame">
+        <div className="katro-band">
+          <div ref={containerRef} className="katro-bed">
+            <div className="katro-half" style={{ background: greenTint }}>
+              {renderRow(0)}
+              {renderRow(1)}
+            </div>
+            <div className="katro-groove" />
+            <div className="katro-half" style={{ background: redTint }}>
+              {renderRow(2)}
+              {renderRow(3)}
             </div>
           </div>
         </div>
-
-        <p className="text-xs text-center" style={{ color: "#5D4037" }}>
-          Copyright 2026 — RASOLOMANANA Heritiana Noe
-        </p>
       </div>
+
+      <p className="text-xs text-center" style={{ color: "#4B3A2A" }}>
+        Copyright 2026 — RASOLOMANANA Heritiana Noe
+      </p>
 
       {/* Settings Dialog */}
       {showSettings && (
@@ -696,24 +630,28 @@ function RoleChip({
   color,
   text,
   active,
+  count,
 }: {
   color: string;
   text: string;
   active: boolean;
+  count: number;
 }) {
   return (
     <div
-      className="flex items-center gap-1.5 px-2 py-1 rounded-full text-xs sm:text-sm font-medium"
+      className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold"
       style={{
-        backgroundColor: active ? "#FFEB3B" : "transparent",
+        backgroundColor: active ? "#FFD54A" : "rgba(255,255,255,0.45)",
         color: "#3E2723",
+        border: `1.5px solid ${active ? "#B8860B" : "rgba(109,68,37,0.4)"}`,
       }}
     >
       <span
-        className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
-        style={{ backgroundColor: color }}
+        className="inline-block w-3 h-3 rounded-full shrink-0"
+        style={{ backgroundColor: color, boxShadow: "0 0 0 2px rgba(0,0,0,0.2)" }}
       />
       {text}
+      <span className="font-normal opacity-70">· {count} voa</span>
     </div>
   );
 }

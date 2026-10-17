@@ -2,7 +2,7 @@ import KatroGame from "@/components/KatroGame";
 
 export default function Home() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#E8D5B5" }}>
+    <div className="min-h-screen">
       <main className="container mx-auto px-3 py-6 flex flex-col items-center gap-6">
         <KatroGame />
         <section className="w-full max-w-3xl mt-2">

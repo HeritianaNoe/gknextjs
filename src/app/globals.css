@@ -1,26 +1,97 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+body {
+  min-height: 100vh;
+  color: #2b2118;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(120% 70% at 50% 0%, #dfe5cf 0%, rgba(223, 229, 207, 0) 60%),
+    #c5cfb4;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --grain: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.012 0.5' numOctaves='3' seed='7'/><feColorMatrix values='0 0 0 0 0.24 0 0 0 0 0.11 0 0 0 0 0.03 0 0 0 1.6 -0.55'/></filter><rect width='100%' height='100%' filter='url(%23g)'/></svg>");
+  --diamonds: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><path d='M10 2L18 10L10 18L2 10Z' fill='none' stroke='%23E0AE72' stroke-opacity='.6' stroke-width='1.2'/><circle cx='10' cy='10' r='1.5' fill='%23E0AE72' fill-opacity='.7'/></svg>");
+}
+
+.katro-title {
+  font-size: clamp(2.4rem, 7vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  padding-left: 0.14em;
+  color: #6a3516;
+  text-shadow: 0 1px 0 rgba(255, 236, 205, 0.7), 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* Cadre: hazo matevina + sary kasoka */
+.katro-frame {
+  width: 100%;
+  padding: 10px;
+  border-radius: 26px;
+  background: var(--grain), linear-gradient(145deg, #7a431f, #4a2410 50%, #62341a);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 205, 150, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.45),
+    0 3px 0 #2a1307,
+    0 22px 36px -14px rgba(35, 16, 4, 0.6);
+}
+
+.katro-band {
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--diamonds), linear-gradient(145deg, #3d1e0c, #2a1408);
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(255, 205, 150, 0.25);
+}
+
+/* Tontolo misy ny lavaka */
+.katro-bed {
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--grain), linear-gradient(135deg, #d9a262, #c48848 50%, #cf9657);
+  box-shadow:
+    0 0 0 2px #7a431f,
+    0 0 0 3px rgba(0, 0, 0, 0.5),
+    inset 0 2px 10px rgba(255, 220, 170, 0.3);
+}
+
+.katro-half {
+  border-radius: 12px;
+  padding: 8px 4px;
+  display: grid;
+  gap: 8px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(60, 30, 8, 0.3);
+  transition: background-color 0.25s;
+}
+
+.katro-groove {
+  height: 10px;
+  margin: 8px 0;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #8d5628, #e6b57c);
+  box-shadow: inset 0 2px 3px rgba(40, 18, 4, 0.6);
+}
+
+.katro-btn {
+  padding: 6px 14px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 10px;
+  color: #3a1d0a;
+  background: linear-gradient(180deg, #f3dfb8, #dcb985);
+  border: 1px solid #6d4425;
+  box-shadow: 0 2px 0 #6d4425;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.katro-btn:hover { filter: brightness(1.05); }
+.katro-btn:active { transform: translateY(2px); box-shadow: 0 0 0 #6d4425; }
+.katro-btn:focus-visible,
+button:focus-visible { outline: 3px solid #ffd54a; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .katro-half, .katro-btn { transition: none; }
 }
